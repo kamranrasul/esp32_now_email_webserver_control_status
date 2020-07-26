@@ -6,6 +6,16 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
+// defining the pins need to control and monitor
+#define INPIN_1 0
+#define INPIN_2 2
+#define INPIN_3 4
+#define INPIN_4 12
+#define INPIN_5 14
+#define INPIN_6 15
+#define INPIN_7 26
+#define INPIN_8 27
+
 // RECEIVER'S MAC Address
 uint8_t broadcastAddress[] = {0x24, 0x62, 0xAB, 0xF9, 0x0E, 0x98};
 
@@ -34,6 +44,16 @@ void setup()
 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
+
+  // Setting pin for read mode
+  pinMode(INPIN_1, INPUT_PULLUP);
+  pinMode(INPIN_2, INPUT_PULLUP);
+  pinMode(INPIN_3, INPUT_PULLUP);
+  pinMode(INPIN_4, INPUT_PULLUP);
+  pinMode(INPIN_5, INPUT_PULLUP);
+  pinMode(INPIN_6, INPUT_PULLUP);
+  pinMode(INPIN_7, INPUT_PULLUP);
+  pinMode(INPIN_8, INPUT_PULLUP);
 
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK)
@@ -64,14 +84,14 @@ void loop()
 {
   // Set values to send
   myData.id = 1;
-  myData.pinStatus[0] = digitalRead(00);
-  myData.pinStatus[1] = digitalRead(02);
-  myData.pinStatus[2] = digitalRead(04);
-  myData.pinStatus[3] = digitalRead(12);
-  myData.pinStatus[4] = digitalRead(14);
-  myData.pinStatus[5] = digitalRead(15);
-  myData.pinStatus[6] = digitalRead(26);
-  myData.pinStatus[7] = digitalRead(27);
+  myData.pinStatus[0] = digitalRead(INPIN_1);
+  myData.pinStatus[1] = digitalRead(INPIN_2);
+  myData.pinStatus[2] = digitalRead(INPIN_3);
+  myData.pinStatus[3] = digitalRead(INPIN_4);
+  myData.pinStatus[4] = digitalRead(INPIN_5);
+  myData.pinStatus[5] = digitalRead(INPIN_6);
+  myData.pinStatus[6] = digitalRead(INPIN_7);
+  myData.pinStatus[7] = digitalRead(INPIN_8);
 
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&myData, sizeof(myData));
