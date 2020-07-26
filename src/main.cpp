@@ -1,19 +1,15 @@
 #include <Arduino.h>
-// Complete Instructions to Get and Change ESP MAC Address: https://RandomNerdTutorials.com/get-change-esp32-esp8266-mac-address-arduino/
+#include <WiFi.h>
 
-#ifdef ESP32
-  #include <WiFi.h>
-#else
-  #include <ESP8266WiFi.h>
-#endif
-
-void setup(){
+void setup()
+{
   Serial.begin(115200);
   Serial.println();
   Serial.print("ESP Board MAC Address:  ");
+  // extracting the mac address and sending it to serial port
   Serial.println(WiFi.macAddress());
 }
- 
-void loop(){
 
+void loop()
+{
 }
