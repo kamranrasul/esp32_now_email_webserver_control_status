@@ -35,6 +35,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
   Serial.printf("Board ID %u: %u bytes\n", myData.id, len);
   // Update the structures with the new incoming data
   boardsStruct = myData;
+  Serial.println();
   for (int i = 0; i < 8; i++)
   {
     Serial.printf("Control %d is %3s.", i + 1, boardsStruct.pinStatus[i] ? "ON" : "OFF");
