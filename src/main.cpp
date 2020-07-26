@@ -38,7 +38,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
   Serial.println();
   for (int i = 0; i < 8; i++)
   {
-    Serial.printf("Control %d is %3s.", i + 1, boardsStruct.pinStatus[i] ? "ON" : "OFF");
+    Serial.printf("Control %d is %3s.", i + 1, boardsStruct.pinStatus[i] ? "OFF" : "ON");
     Serial.println();
   }
   Serial.println();
