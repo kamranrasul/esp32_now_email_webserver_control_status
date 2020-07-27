@@ -6,10 +6,16 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <string.h>
+#include "time.h"
 
-// Replace with your network credentials
+// Local WiFi Credentials
 const char *ssid = "Hidden_network";
 const char *password = "pak.awan.pk";
+
+// time variable setup
+const char *ntpServer = "pool.ntp.org";
+const long gmtOffset_sec = -25362;
+const int daylightOffset_sec = 3600;
 
 // Set web server port number to 80
 WiFiServer server(80);
@@ -41,9 +47,45 @@ typedef struct struct_message
 // Create an array with all the structures
 struct_message boardsStruct;
 
+// time function
+void printLocalTime()
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo))
+  {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "\n%A, %B %d, %Y %H:%M:%S");
+}
+
+void timeSetup()
+{
+  //connect to WiFi
+  Serial.printf("Connecting to %s ", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println(" CONNECTED");
+
+  //init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();
+
+  //disconnect WiFi as it's no longer needed
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+}
+
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
 {
+  // display time
+  printLocalTime();
+
   Serial.print("\nMy MAC Address:  ");
   Serial.println(WiFi.macAddress());
   Serial.println();
@@ -65,7 +107,6 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
     Serial.printf("Control %d is %3s.", i + 1, boardsStruct.pinStatus[i] ? "OFF" : "ON");
     Serial.println();
   }
-  webDelay += 2000;
 }
 
 // setting up esp NOW
@@ -213,18 +254,13 @@ void setup()
   //Initialize Serial Monitor
   Serial.begin(115200);
 
+  // get time from internet
+  timeSetup();
+
   // setting up esp NOW
   espNowSetup();
 }
 
 void loop()
 {
-  /*  delay(5000);
-  if (millis() > webDelay)
-  {
-    wifiSetup();
-    esp2Web();
-    delay(2000);
-    webDelay = webDelay + 10000;
-  }*/
 }
