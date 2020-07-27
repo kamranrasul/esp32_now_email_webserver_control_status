@@ -148,7 +148,7 @@ void mpu_read() {
   // setting for register for reading the value
   Wire.write(TEMP_REG);
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU_addr, 2, true);
+  Wire.requestFrom(MPU_addr, 2, 1);
 
   // reading 2 registers 0x41 and 0x42, as high and low
   reading = Wire.read() << 8 | Wire.read();
