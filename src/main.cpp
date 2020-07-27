@@ -113,7 +113,7 @@ void setup()
   Serial.print("Connecting to ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
+  //while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
@@ -136,11 +136,11 @@ void loop()
     esp2espComm();
     espCommDelay = millis() + 10000;
   }
-  if (millis() > webDelay)
+  /*if (millis() > webDelay)
   {
     esp2Web();
     webDelay = millis() + 5000;
-  }
+  }*/
 }
 
 void readPinStatus()
@@ -219,8 +219,10 @@ void esp2Web()
 
             for (int i = 0; i < 8; i++)
             {
-              // writing the Pin State of web
+              Serial.printf("Control %d is %3s.", i + 1, myData.pinStatus[i] ? "OFF" : "ON");
+              Serial.println();
 
+              // writing the Pin State of web
               char pinState[10];
               int num = i + 1;
               itoa(num, pinState, 10);
@@ -230,7 +232,7 @@ void esp2Web()
 
               client.println("<p>State of pin: " + pS + "</p>");
               // If the output26State is off, it displays the ON button
-              if (myData.pinStatus[i])
+              if (!myData.pinStatus[i])
               {
                 client.println("<p><a href=\"/on\"><button class=\"button\">ON</button></a></p>");
               }
@@ -238,7 +240,6 @@ void esp2Web()
               {
                 client.println("<p><a href=\"/off\"><button class=\"button button2\">OFF</button></a></p>");
               }
-              Serial.println();
 
               // The HTTP response ends with another blank line
               client.println();
