@@ -44,6 +44,9 @@ struct_message boardsStruct;
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
 {
+  Serial.print("\nMy MAC Address:  ");
+  Serial.println(WiFi.macAddress());
+  Serial.println();
   // Copies the sender mac address to a string
   char macStr[18];
   Serial.print("Packet received from: ");
