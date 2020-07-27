@@ -130,10 +130,6 @@ void mpu_read()
 
   // converting to from raw to engineering value
   myData.temperature = reading / 340.0 + 36.53;
-
-  // displaying on the serial output
-  Serial.printf("Temperature: %.2f °C or %.2f °F", myData.temperature, (myData.temperature * 1.8) + 32);
-  Serial.println();
 }
 
 void setup()
@@ -143,7 +139,7 @@ void setup()
 
   pinSetup();
   wireSetup();
-  
+
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
@@ -179,6 +175,9 @@ void loop()
 
   // reading from MPU
   mpu_read();
+  // displaying on the serial output
+  Serial.printf("Temperature: %.2f °C or %.2f °F", myData.temperature, (myData.temperature * 1.8) + 32);
+  Serial.println();
 
   // sending message
   espNowSend();
