@@ -176,8 +176,12 @@ void loop()
   // reading from MPU
   mpu_read();
   // displaying on the serial output
-  Serial.printf("Temperature: %.2f °C or %.2f °F", myData.temperature, (myData.temperature * 1.8) + 32);
+  Serial.printf("\nTemperature: %.2f °C or %.2f °F", myData.temperature, (myData.temperature * 1.8) + 32);
   Serial.println();
+  Serial.println();
+
+  Serial.print("My MAC Address:  ");
+  Serial.println(WiFi.macAddress());
 
   // sending message
   espNowSend();
