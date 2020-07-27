@@ -5,6 +5,8 @@
 #include <Arduino.h>
 #include <esp_now.h>
 #include <WiFi.h>
+#include "ESPAsyncWebServer.h"
+#include <Arduino_JSON.h>
 
 // Structure example to receive data
 // Must match the sender structure
@@ -12,7 +14,12 @@ typedef struct struct_message
 {
   int id; // must be unique for each sender board
   bool pinStatus[8];
+  float temperature;
+  float humidity;
+  float pressure;
 } struct_message;
+
+struct_message;
 
 // Create a struct_message called myData
 struct_message myData;
@@ -41,14 +48,13 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
     Serial.printf("Control %d is %3s.", i + 1, boardsStruct.pinStatus[i] ? "OFF" : "ON");
     Serial.println();
   }
+  Serial.printf("Temperature: %.2f °C or %.2f °F", boardsStruct.temperature, (boardsStruct.temperature * 1.8) + 32);
   Serial.println();
 }
 
-void setup()
+// setting up esp NOW
+void espNowSetup()
 {
-  //Initialize Serial Monitor
-  Serial.begin(115200);
-
   //Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
@@ -62,6 +68,15 @@ void setup()
   // Once ESPNow is successfully Init, we will register for recv CB to
   // get recv packer info
   esp_now_register_recv_cb(OnDataRecv);
+}
+
+void setup()
+{
+  //Initialize Serial Monitor
+  Serial.begin(115200);
+
+  // setting up esp NOW
+  espNowSetup();
 }
 
 void loop()
