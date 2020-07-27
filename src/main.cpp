@@ -6,6 +6,16 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <Wire.h>
+#include "time.h"
+
+// Local WiFi Credentials
+const char *ssid = "Hidden_network";
+const char *password = "pak.awan.pk";
+
+// time variable setup
+const char *ntpServer = "pool.ntp.org";
+const long gmtOffset_sec = -25362;
+const int daylightOffset_sec = 3600;
 
 // temperature register of MPU-6050
 #define TEMP_REG 0X41
@@ -43,6 +53,21 @@ typedef struct struct_message
 //Create a struct_message called myData
 struct_message myData;
 
+// Register peer
+esp_now_peer_info_t peerInfo;
+
+// time function
+void printLocalTime()
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo))
+  {
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "\n%A, %B %d, %Y %H:%M:%S");
+}
+
 // callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
@@ -64,7 +89,7 @@ void pinSetup()
   pinMode(INPIN_8, INPUT_PULLUP);
 }
 
-// setting up Wire Transfer !2C
+// setting up Wire Transfer i2c
 void wireSetup()
 {
   // I2C setup
@@ -81,6 +106,30 @@ void wireSetup()
 // setting up esp NOW
 void espNowSetup()
 {
+  // Set device as a Wi-Fi Station
+  WiFi.mode(WIFI_STA);
+
+  // Init ESP-NOW
+  if (esp_now_init() != ESP_OK)
+  {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  // Once ESPNow is successfully Init, we will register for Send CB to
+  // get the status of Trasnmitted packet
+  esp_now_register_send_cb(OnDataSent);
+
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  // Add peer
+  if (esp_now_add_peer(&peerInfo) != ESP_OK)
+  {
+    Serial.println("Failed to add peer");
+    return;
+  }
 }
 
 // reading Pin Status
@@ -132,40 +181,36 @@ void mpu_read()
   myData.temperature = reading / 340.0 + 36.53;
 }
 
+void timeSetup()
+{
+  //connect to WiFi
+  Serial.printf("Connecting to %s ", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println(" CONNECTED");
+
+  //init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();
+
+  //disconnect WiFi as it's no longer needed
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+}
+
 void setup()
 {
   // Init Serial Monitor
   Serial.begin(115200);
 
+  timeSetup();
   pinSetup();
   wireSetup();
-
-  // Set device as a Wi-Fi Station
-  WiFi.mode(WIFI_STA);
-
-  // Init ESP-NOW
-  if (esp_now_init() != ESP_OK)
-  {
-    Serial.println("Error initializing ESP-NOW");
-    return;
-  }
-
-  // Once ESPNow is successfully Init, we will register for Send CB to
-  // get the status of Trasnmitted packet
-  esp_now_register_send_cb(OnDataSent);
-
-  // Register peer
-  esp_now_peer_info_t peerInfo;
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = 0;
-  peerInfo.encrypt = false;
-
-  // Add peer
-  if (esp_now_add_peer(&peerInfo) != ESP_OK)
-  {
-    Serial.println("Failed to add peer");
-    return;
-  }
+  espNowSetup();
 }
 
 void loop()
@@ -175,6 +220,10 @@ void loop()
 
   // reading from MPU
   mpu_read();
+
+  // display time
+  printLocalTime();
+
   // displaying on the serial output
   Serial.printf("\nTemperature: %.2f °C or %.2f °F", myData.temperature, (myData.temperature * 1.8) + 32);
   Serial.println();
@@ -186,5 +235,5 @@ void loop()
   // sending message
   espNowSend();
 
-  delay(10000);
+  delay(7000);
 }
