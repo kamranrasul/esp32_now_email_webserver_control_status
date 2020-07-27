@@ -57,7 +57,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
 
   Serial.printf("Board ID %u: %u bytes", boardsStruct.id, len);
   Serial.println();
-  Serial.printf("Temperature: %.2f °C or %.2f °F", boardsStruct.temperature, (boardsStruct.temperature * 1.8) + 32);
+  Serial.printf("\nTemperature: %.2f °C or %.2f °F\n", boardsStruct.temperature, (boardsStruct.temperature * 1.8) + 32);
   Serial.println();
 
   for (int i = 0; i < 8; i++)
@@ -65,6 +65,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
     Serial.printf("Control %d is %3s.", i + 1, boardsStruct.pinStatus[i] ? "OFF" : "ON");
     Serial.println();
   }
+  webDelay += 2000;
 }
 
 // setting up esp NOW
@@ -211,14 +212,19 @@ void setup()
 {
   //Initialize Serial Monitor
   Serial.begin(115200);
+
+  // setting up esp NOW
   espNowSetup();
 }
 
 void loop()
 {
-/*  if (millis() > webDelay)
+  /*  delay(5000);
+  if (millis() > webDelay)
   {
+    wifiSetup();
     esp2Web();
-    webDelay = millis() + 5000;
+    delay(2000);
+    webDelay = webDelay + 10000;
   }*/
 }
