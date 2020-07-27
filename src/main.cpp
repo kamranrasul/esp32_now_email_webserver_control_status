@@ -41,11 +41,8 @@ typedef struct struct_message
 // Create a struct_message called myData
 struct_message myData;
 
-// Create a structure to hold the readings from each board
-struct_message board1;
-
 // Create an array with all the structures
-struct_message boardsStruct = board1;
+struct_message boardsStruct;
 
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
@@ -60,7 +57,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len)
 
   Serial.printf("Board ID %u: %u bytes", boardsStruct.id, len);
   Serial.println();
-  Serial.printf("Temperature: %.2f °C or %.2f °F", myData.temperature, (myData.temperature * 1.8) + 32);
+  Serial.printf("Temperature: %.2f °C or %.2f °F", boardsStruct.temperature, (boardsStruct.temperature * 1.8) + 32);
   Serial.println();
 
   for (int i = 0; i < 8; i++)
