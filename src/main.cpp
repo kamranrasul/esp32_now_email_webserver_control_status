@@ -38,9 +38,6 @@ typedef struct struct_message
   float pressure;
 } struct_message;
 
-// Create a struct_message called myData
-struct_message myData;
-
 // Create an array with all the structures
 struct_message boardsStruct;
 
@@ -140,13 +137,13 @@ void esp2Web()
 
             // displaying temperature
             char tempVal[10];
-            sprintf(tempVal, "%.2f", myData.temperature);
+            sprintf(tempVal, "%.2f", boardsStruct.temperature);
             String temp_Str = tempVal;
             client.println("<p>Temperature: " + temp_Str + "</p>");
 
             for (int i = 0; i < 8; i++)
             {
-              Serial.printf("Control %d is %3s.", i + 1, myData.pinStatus[i] ? "OFF" : "ON");
+              Serial.printf("Control %d is %3s.", i + 1, boardsStruct.pinStatus[i] ? "OFF" : "ON");
               Serial.println();
 
               // writing the Pin State of web
@@ -159,7 +156,7 @@ void esp2Web()
 
               client.println("<p>State of pin: " + pS + "</p>");
               // If the output26State is off, it displays the ON button
-              if (!myData.pinStatus[i])
+              if (!boardsStruct.pinStatus[i])
               {
                 client.println("<p><a href=\"/on\"><button class=\"button\">ON</button></a></p>");
               }
